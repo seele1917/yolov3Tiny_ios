@@ -21,7 +21,7 @@ class VisionObjectRecognitionViewController: ViewController {
         // Setup Vision parts
         let error: NSError! = nil
         
-        guard let modelURL = Bundle.main.url(forResource: "ObjectDetector", withExtension: "mlmodelc") else {
+        guard let modelURL = Bundle.main.url(forResource: "YOLOv3Tiny", withExtension: "mlmodelc") else {
             return NSError(domain: "VisionObjectRecognitionViewController", code: -1, userInfo: [NSLocalizedDescriptionKey: "Model file is missing"])
         }
         do {
@@ -53,6 +53,9 @@ class VisionObjectRecognitionViewController: ViewController {
             // Select only the label with the highest confidence.
             let topLabelObservation = objectObservation.labels[0]
             let objectBounds = VNImageRectForNormalizedRect(objectObservation.boundingBox, Int(bufferSize.width), Int(bufferSize.height))
+            print(objectBounds)
+            print(bufferSize.width, bufferSize.height)
+            print(topLabelObservation)
             
             let shapeLayer = self.createRoundedRectLayerWithBounds(objectBounds)
             
@@ -70,7 +73,7 @@ class VisionObjectRecognitionViewController: ViewController {
         guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else {
             return
         }
-        
+        print(CVPixelBufferGetWidth(pixelBuffer), CVPixelBufferGetHeight(pixelBuffer))
         let exifOrientation = exifOrientationFromDeviceOrientation()
         
         let imageRequestHandler = VNImageRequestHandler(cvPixelBuffer: pixelBuffer, orientation: exifOrientation, options: [:])
@@ -150,8 +153,8 @@ class VisionObjectRecognitionViewController: ViewController {
         shapeLayer.bounds = bounds
         shapeLayer.position = CGPoint(x: bounds.midX, y: bounds.midY)
         shapeLayer.name = "Found Object"
-        shapeLayer.backgroundColor = CGColor(colorSpace: CGColorSpaceCreateDeviceRGB(), components: [1.0, 1.0, 0.2, 0.4])
-        shapeLayer.cornerRadius = 7
+        shapeLayer.borderColor = CGColor(colorSpace: CGColorSpaceCreateDeviceRGB(), components: [1.0, 1.0, 0.2, 1.0])
+        shapeLayer.borderWidth = 2
         return shapeLayer
     }
     
